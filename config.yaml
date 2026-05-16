@@ -1,0 +1,58 @@
+# Configuration for ApexAI Proctoring System
+
+camera:
+  source: 0
+  width: 640
+  height: 480
+  fps: 30
+
+face_tracking:
+  min_detection_confidence: 0.5
+  min_tracking_confidence: 0.5
+  max_faces: 3
+
+head_pose:
+  pitch_threshold: 20.0
+  yaw_threshold: 25.0
+  roll_threshold: 15.0
+
+gaze_estimation:
+  horizontal_threshold_left: 0.5
+  horizontal_threshold_right: 0.5
+  vertical_threshold_up: 0.5
+  vertical_threshold_down: 0.5
+  gaze_smoothing_frames: 5
+
+object_detection:
+  model_path: "yolov8n.pt"
+  confidence_threshold: 0.4
+  frame_skip: 10 # Run object detection every N frames to save CPU
+  suspicious_classes:
+    - cell phone
+    - book
+    - laptop
+    - remote
+
+audio_anomaly:
+  sample_rate: 16000
+  chunk_duration_ms: 30
+  vad_aggressiveness: 1 # 0 (most sensitive) to 3 (least sensitive)
+  speech_threshold_seconds: 0.5
+
+browser_monitor:
+  host: "127.0.0.1"
+  port: 8765
+
+temporal_engine:
+  window_size_seconds: 10
+  score_decay_rate: 0.95
+  weights:
+    face_missing: 10
+    multiple_faces: 20
+    head_pose_anomaly: 25
+    gaze_anomaly: 5
+    object_detected: 15
+    audio_anomaly: 5
+    browser_violation: 25
+  threshold_warning: 50
+  threshold_critical: 80
