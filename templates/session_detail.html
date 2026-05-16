@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ApexAI — Session {{ session_id[:8] }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="admin-page">
+  <header class="admin-header">
+    <div class="logo-sm">ApexAI <span>Admin</span></div>
+    <a href="/admin" class="btn btn-sm btn-ghost">&larr; Back</a>
+  </header>
+
+  <main class="admin-main">
+    <section class="admin-card">
+      <h2>Session Events — <code>{{ session_id }}</code></h2>
+      {% if events %}
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr><th>#</th><th>Event Type</th><th>Timestamp</th><th>Screenshot</th></tr>
+          </thead>
+          <tbody>
+            {% for e in events %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td><span class="verdict-badge verdict-{{ 'cheating' if e.event_type == 'cheating' else 'warning' }}">{{ e.event_type }}</span></td>
+              <td>{{ e.timestamp[:19].replace('T',' ') }}</td>
+              <td>
+                {% if e.screenshot %}
+                <a href="{{ url_for('screenshot', filename=e.screenshot.replace('screenshots/', '').replace('screenshots\\', '').replace('\\', '/')) }}" target="_blank" class="btn btn-sm">View</a>
+                {% else %}—{% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="muted">No anomaly events were recorded for this session.</p>
+      {% endif %}
+    </section>
+  </main>
+</body>
+</html>

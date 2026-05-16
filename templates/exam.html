@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ApexAI — Exam Session</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+</head>
+<body class="exam-page">
+
+  <!-- Cheating Banner (hidden by default) -->
+  <div id="cheating-banner" class="cheating-banner hidden">
+    &#9888; CHEATING DETECTED — This session has been flagged
+  </div>
+
+  <header class="exam-header">
+    <div class="exam-header-left">
+      <div class="logo-sm">ApexAI</div>
+      <div class="user-meta">
+        <strong>{{ user.name }}</strong>
+        <span>{{ user.get('course', '') }} &bull; Semester {{ user.get('semester', '') }}</span>
+      </div>
+    </div>
+    <div class="exam-header-right">
+      <div id="connection-dot" class="dot dot-yellow" title="Connecting..."></div>
+      <a href="/logout" class="btn btn-sm btn-ghost">Logout</a>
+    </div>
+  </header>
+
+  <main class="exam-main">
+    <!-- Left: Webcam feed -->
+    <section class="cam-section">
+      <div class="cam-wrapper">
+        <video id="video" autoplay muted playsinline></video>
+        <canvas id="canvas" style="display:none"></canvas>
+        <div id="cam-overlay">
+          <span id="cam-status">Initializing camera...</span>
+        </div>
+      </div>
+      <div class="cam-info">
+        <span id="fps-display">0 FPS</span>
+        <span id="session-id-display">Session: —</span>
+      </div>
+    </section>
+
+    <!-- Right: Status dashboard -->
+    <aside class="dashboard">
+      <h2>Proctoring Dashboard</h2>
+
+      <div class="score-ring-wrapper">
+        <svg class="score-ring" width="120" height="120" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="52" stroke="#1e2235" stroke-width="10" fill="none"/>
+          <circle id="score-arc" cx="60" cy="60" r="52" stroke="#6C63FF" stroke-width="10"
+                  fill="none" stroke-linecap="round"
+                  stroke-dasharray="327" stroke-dashoffset="327"
+                  transform="rotate(-90 60 60)"/>
+        </svg>
+        <div class="score-center">
+          <span id="score-value">0</span>
+          <small>Risk</small>
+        </div>
+      </div>
+
+      <div id="severity-badge" class="severity-badge sev-normal">Normal</div>
+
+      <div class="stat-grid">
+        <div class="stat-card" id="card-face">
+          <div class="stat-icon">&#128100;</div>
+          <div class="stat-info">
+            <span class="stat-label">Face</span>
+            <span class="stat-val" id="stat-face">Detecting...</span>
+          </div>
+        </div>
+        <div class="stat-card" id="card-multi">
+          <div class="stat-icon">&#128101;</div>
+          <div class="stat-info">
+            <span class="stat-label">Multi-Face</span>
+            <span class="stat-val" id="stat-multi">No</span>
+          </div>
+        </div>
+        <div class="stat-card" id="card-head">
+          <div class="stat-icon">&#129488;</div>
+          <div class="stat-info">
+            <span class="stat-label">Head Pose</span>
+            <span class="stat-val" id="stat-head">CENTER</span>
+          </div>
+        </div>
+        <div class="stat-card" id="card-gaze">
+          <div class="stat-icon">&#128065;</div>
+          <div class="stat-info">
+            <span class="stat-label">Gaze</span>
+            <span class="stat-val" id="stat-gaze">CENTER</span>
+          </div>
+        </div>
+        <div class="stat-card" id="card-audio">
+          <div class="stat-icon">&#127908;</div>
+          <div class="stat-info">
+            <span class="stat-label">Audio</span>
+            <span class="stat-val" id="stat-audio">Normal</span>
+          </div>
+        </div>
+        <div class="stat-card" id="card-object">
+          <div class="stat-icon">&#128247;</div>
+          <div class="stat-info">
+            <span class="stat-label">Objects</span>
+            <span class="stat-val" id="stat-object">None</span>
+          </div>
+        </div>
+        <div class="stat-card" id="card-browser">
+          <div class="stat-icon">&#127760;</div>
+          <div class="stat-info">
+            <span class="stat-label">Browser</span>
+            <span class="stat-val" id="stat-browser">OK</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="event-log-header">Recent Events</div>
+      <div id="event-log" class="event-log"></div>
+    </aside>
+  </main>
+
+  <script src="{{ url_for('static', filename='js/exam.js') }}"></script>
+</body>
+</html>

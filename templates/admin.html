@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ApexAI — Admin Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+</head>
+<body class="admin-page">
+  <header class="admin-header">
+    <div class="logo-sm">ApexAI <span>Admin</span></div>
+    <div class="admin-header-right">
+      <span>{{ admin.name }}</span>
+      <a href="/logout" class="btn btn-sm btn-ghost">Logout</a>
+    </div>
+  </header>
+
+  <main class="admin-main">
+    <!-- Live users panel -->
+    <section class="admin-card">
+      <h2>&#128994; Live Users <span id="live-count" class="badge">0</span></h2>
+      <div id="live-users-grid" class="live-grid">
+        <p class="muted">No active exam sessions right now.</p>
+      </div>
+    </section>
+
+    <!-- Past sessions -->
+    <section class="admin-card">
+      <h2>Session History</h2>
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Student</th><th>Email</th><th>Course</th><th>Semester</th>
+              <th>Started</th><th>Ended</th><th>Score</th><th>Verdict</th><th>Events</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in sessions %}
+            <tr class="verdict-{{ s.verdict | lower | replace(' ', '-') }}">
+              <td>{{ s.user_name }}</td>
+              <td>{{ s.email }}</td>
+              <td>{{ s.course or '—' }}</td>
+              <td>{{ s.semester or '—' }}</td>
+              <td>{{ s.started_at[:19].replace('T',' ') }}</td>
+              <td>{{ s.ended_at[:19].replace('T',' ') if s.ended_at else 'Active' }}</td>
+              <td><strong>{{ "%.1f"|format(s.final_score) }}</strong></td>
+              <td><span class="verdict-badge verdict-{{ s.verdict | lower }}">{{ s.verdict }}</span></td>
+              <td><a href="/admin/session/{{ s.id }}" class="btn btn-sm">View</a></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="9" class="muted">No sessions recorded yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Poll active users every 3 seconds
+    async function refreshLive() {
+      const res  = await fetch('/api/active_users');
+      const data = await res.json();
+      document.getElementById('live-count').textContent = data.length;
+      const grid = document.getElementById('live-users-grid');
+      if (!data.length) {
+        grid.innerHTML = '<p class="muted">No active exam sessions right now.</p>';
+        return;
+      }
+      grid.innerHTML = data.map(u => `
+        <div class="live-card sev-${u.severity.toLowerCase()}">
+          <div class="live-name">${u.name}</div>
+          <div class="live-email">${u.email}</div>
+          <div class="live-score">Risk: <strong>${u.score}</strong></div>
+          <div class="live-sev"><span class="verdict-badge verdict-${u.severity.toLowerCase()}">${u.severity}</span></div>
+        </div>
+      `).join('');
+    }
+    refreshLive();
+    setInterval(refreshLive, 3000);
+  </script>
+</body>
+</html>

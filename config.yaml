@@ -53,6 +53,6 @@ temporal_engine:
     gaze_anomaly: 5
     object_detected: 15
     audio_anomaly: 5
-    browser_violation: 25
+    browser_violation: 35
   threshold_warning: 50
   threshold_critical: 80
