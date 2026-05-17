@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — APEXAI Quiz</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}" />
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-brand">APEXAI<small>Quiz Management</small></div>
+      <nav>
+        <button type="button" class="nav-item active" data-panel="panel-dashboard">Dashboard</button>
+        <button type="button" class="nav-item" data-panel="panel-courses">Courses</button>
+        <button type="button" class="nav-item" data-panel="panel-semesters">Semesters</button>
+        <button type="button" class="nav-item" data-panel="panel-users">Users</button>
+        <button type="button" class="nav-item" data-panel="panel-allocations">Allocations</button>
+        <button type="button" class="nav-item" data-panel="panel-enrollments">Enrollments</button>
+        <button type="button" class="nav-item" data-panel="panel-quizzes">All Quizzes</button>
+      </nav>
+      <div class="sidebar-footer">
+        <p><strong>{{ user.first_name }} {{ user.last_name }}</strong></p>
+        <p style="color:var(--muted);font-size:0.75rem">{{ user.email }}</p>
+        <a href="/logout" class="btn btn-ghost btn-sm" style="width:100%;margin-top:0.75rem;text-align:center">Sign out</a>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <section id="panel-dashboard" class="panel active">
+        <header class="page-header"><h1>Dashboard</h1></header>
+        <div id="stats-grid" class="stats-grid"></div>
+      </section>
+
+      <section id="panel-courses" class="panel">
+        <header class="page-header">
+          <h1>Courses</h1>
+          <button type="button" class="btn btn-primary" id="btn-add-course">Add Course</button>
+        </header>
+        <div class="toolbar">
+          <input type="search" id="course-search" placeholder="Search courses..." style="max-width:280px" />
+        </div>
+        <div id="courses-table"></div>
+      </section>
+
+      <section id="panel-semesters" class="panel">
+        <header class="page-header">
+          <h1>Semesters</h1>
+          <button type="button" class="btn btn-primary" id="btn-add-semester">Add Semester</button>
+        </header>
+        <div id="semesters-table"></div>
+      </section>
+
+      <section id="panel-users" class="panel">
+        <header class="page-header"><h1>Users</h1></header>
+        <nav class="tabs">
+          <button type="button" class="tab-btn active" data-user-tab="lecturers">Lecturers</button>
+          <button type="button" class="tab-btn" data-user-tab="students">Students</button>
+          <button type="button" class="btn btn-primary" id="btn-add-user" style="margin-left:auto">Add User</button>
+        </nav>
+        <div id="users-table"></div>
+      </section>
+
+      <section id="panel-allocations" class="panel">
+        <header class="page-header">
+          <h1>Lecturer Allocations</h1>
+          <button type="button" class="btn btn-primary" id="btn-assign-lecturer">Assign Lecturer</button>
+        </header>
+        <div id="allocations-table"></div>
+      </section>
+
+      <section id="panel-enrollments" class="panel">
+        <header class="page-header">
+          <h1>Student Enrollments</h1>
+          <button type="button" class="btn btn-primary" id="btn-enroll-student">Enroll Student</button>
+        </header>
+        <div id="enrollments-table"></div>
+      </section>
+
+      <section id="panel-quizzes" class="panel">
+        <header class="page-header"><h1>All Quizzes</h1></header>
+        <div id="quizzes-table"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modals -->
+  <div class="modal-overlay" id="modal-course">
+    <div class="modal">
+      <header class="modal-header"><h2>Add Course</h2><button type="button" class="btn btn-ghost btn-sm modal-close" data-modal="modal-course">×</button></header>
+      <form id="form-course">
+        <div class="form-group"><label>Code</label><input name="code" required /></div>
+        <div class="form-group"><label>Name</label><input name="name" required /></div>
+        <div class="form-group"><label>Semester</label><select name="semester_id" required id="course-semester-select"></select></div>
+        <footer class="modal-actions">
+          <button type="button" class="btn btn-ghost modal-close" data-modal="modal-course">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-semester">
+    <div class="modal">
+      <header class="modal-header"><h2>Add Semester</h2><button type="button" class="btn btn-ghost btn-sm modal-close" data-modal="modal-semester">×</button></header>
+      <form id="form-semester">
+        <div class="form-group"><label>Name</label><input name="name" required placeholder="Fall 2025" /></div>
+        <div class="form-row">
+          <div class="form-group"><label>Year</label><input name="year" type="number" required value="2025" /></div>
+          <div class="form-group"><label>Term</label><input name="term" placeholder="Fall" /></div>
+        </div>
+        <footer class="modal-actions">
+          <button type="button" class="btn btn-ghost modal-close" data-modal="modal-semester">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-user">
+    <div class="modal">
+      <header class="modal-header"><h2 id="modal-user-title">Add User</h2><button type="button" class="btn btn-ghost btn-sm modal-close" data-modal="modal-user">×</button></header>
+      <form id="form-user">
+        <div class="form-row">
+          <div class="form-group"><label>First name</label><input name="first_name" required /></div>
+          <div class="form-group"><label>Last name</label><input name="last_name" required /></div>
+        </div>
+        <div class="form-group"><label>Email</label><input name="email" type="email" required /></div>
+        <div class="form-group"><label>Password (optional)</label><input name="password" placeholder="Auto-generated if empty" /></div>
+        <footer class="modal-actions">
+          <button type="button" class="btn btn-ghost modal-close" data-modal="modal-user">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-creds">
+    <div class="modal">
+      <header class="modal-header"><h2>Generated Credentials</h2><button type="button" class="btn btn-ghost btn-sm modal-close" data-modal="modal-creds">×</button></header>
+      <div class="credentials-box" id="creds-content"></div>
+      <footer class="modal-actions">
+        <button type="button" class="btn btn-primary modal-close" data-modal="modal-creds">Done</button>
+      </footer>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-allocation">
+    <div class="modal">
+      <header class="modal-header"><h2>Assign Lecturer to Course</h2><button type="button" class="btn btn-ghost btn-sm modal-close" data-modal="modal-allocation">×</button></header>
+      <form id="form-allocation">
+        <div class="form-group"><label>Lecturer</label><select name="lecturer_id" id="alloc-lecturer-select" required></select></div>
+        <div class="form-group"><label>Course</label><select name="course_id" id="alloc-course-select" required></select></div>
+        <footer class="modal-actions">
+          <button type="button" class="btn btn-ghost modal-close" data-modal="modal-allocation">Cancel</button>
+          <button type="submit" class="btn btn-primary">Assign</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-enrollment">
+    <div class="modal">
+      <header class="modal-header"><h2>Enroll Student</h2><button type="button" class="btn btn-ghost btn-sm modal-close" data-modal="modal-enrollment">×</button></header>
+      <form id="form-enrollment">
+        <div class="form-group"><label>Student</label><select name="student_id" id="enroll-student-select" required></select></div>
+        <div class="form-group"><label>Course</label><select name="course_id" id="enroll-course-select" required></select></div>
+        <div class="form-group"><label>Semester</label><select name="semester_id" id="enroll-semester-select" required></select></div>
+        <footer class="modal-actions">
+          <button type="button" class="btn btn-ghost modal-close" data-modal="modal-enrollment">Cancel</button>
+          <button type="submit" class="btn btn-primary">Enroll</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/api.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/ui.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+</body>
+</html>

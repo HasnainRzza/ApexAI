@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Take Quiz — APEXAI</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}" />
+</head>
+<body>
+  <main class="main-content" style="margin-left:0;max-width:800px;margin:0 auto;padding:1.5rem">
+    <header class="page-header">
+      <h1 id="quiz-title">Quiz</h1>
+      <a href="/student" class="btn btn-ghost btn-sm">Back</a>
+    </header>
+
+    <div id="quiz-timer" class="quiz-timer hidden">
+      <span>Time remaining</span>
+      <strong id="timer-display">--:--</strong>
+    </div>
+
+    <div id="quiz-loading" class="loading">Loading quiz...</div>
+    <form id="quiz-form" class="hidden"></form>
+    <div id="quiz-result" class="card hidden"></div>
+  </main>
+
+  <script>
+    window.QUIZ_ID = {{ quiz_id }};
+  </script>
+  <script src="{{ url_for('static', filename='js/api.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/ui.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/take_quiz.js') }}"></script>
+</body>
+</html>

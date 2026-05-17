@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student — APEXAI Quiz</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}" />
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-brand">APEXAI<small>Student Portal</small></div>
+      <nav>
+        <button type="button" class="nav-item active" data-panel="panel-courses">My Courses</button>
+        <button type="button" class="nav-item" data-panel="panel-active">Active Quizzes</button>
+        <button type="button" class="nav-item" data-panel="panel-history">Quiz History</button>
+      </nav>
+      <div class="sidebar-footer">
+        <p><strong>{{ user.first_name }} {{ user.last_name }}</strong></p>
+        <p style="color:var(--muted);font-size:0.75rem">{{ user.email }}</p>
+        <a href="/logout" class="btn btn-ghost btn-sm" style="width:100%;margin-top:0.75rem;text-align:center">Sign out</a>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <section id="panel-courses" class="panel active">
+        <header class="page-header"><h1>Enrolled Courses</h1></header>
+        <div id="courses-table"></div>
+      </section>
+
+      <section id="panel-active" class="panel">
+        <header class="page-header"><h1>Active Quizzes</h1></header>
+        <div id="active-quizzes"></div>
+      </section>
+
+      <section id="panel-history" class="panel">
+        <header class="page-header"><h1>All Quizzes</h1></header>
+        <div id="history-table"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/api.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/ui.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/student.js') }}"></script>
+</body>
+</html>
